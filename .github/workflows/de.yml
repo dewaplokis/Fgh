@@ -1,0 +1,27 @@
+name: freerdp6hours
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    timeout-minutes: 9999
+
+    steps:
+    - name: Mendownload Ngrok.
+      run: |
+        Invoke-WebRequest https://github.com/extizi/windowsRDP/raw/main/loop.bat -OutFile loop.bat
+      - name: Make YML file NGROK.
+        run: start NGROK-AP.bat
+      - name: Enable RDP Access
+        run: |
+           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Terminal Server'-name"fDenyTSConnections" -Value 0 
+           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+      - name: Tunnel
+        run: sc start ngrok
+      - name: Connect to your RDP 2core-7GB Ram.
+        run: cmd /c NGROK-CHECK.bat
+      - name: Finish
+        run: cmd /c loop.bat
